@@ -10,27 +10,27 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-–bg: #080810;
-–card: #0f0f1a;
-–border: rgba(255,255,255,0.07);
-–orange: #ff6b1a;
-–orange2: #ff9a4d;
-–gold: #f5c842;
-–blue: #4da6ff;
-–purple: #a78bfa;
-–green: #34d399;
-–teal: #2dd4bf;
-–text: #f0eeff;
-–text-body: #c4c0de;
-–muted: #6b6b8a;
-–font: ‘Outfit’, sans-serif;
-–mono: ‘JetBrains Mono’, monospace;
+--bg: #080810;
+--card: #0f0f1a;
+--border: rgba(255,255,255,0.07);
+--orange: #ff6b1a;
+--orange2: #ff9a4d;
+--gold: #f5c842;
+--blue: #4da6ff;
+--purple: #a78bfa;
+--green: #34d399;
+--teal: #2dd4bf;
+--text: #f0eeff;
+--text-body: #c4c0de;
+--muted: #6b6b8a;
+--font: ‘Outfit’, sans-serif;
+--mono: ‘JetBrains Mono’, monospace;
 }
 
 body {
-background: var(–bg);
-color: var(–text);
-font-family: var(–font);
+background: var(--bg);
+color: var(--text);
+font-family: var(--font);
 font-size: 16px;
 line-height: 1.6;
 min-height: 100vh;
@@ -68,37 +68,37 @@ display: flex; flex-direction: column; align-items: flex-end; gap: 3px;
 min-width: 196px;
 }
 #timer-label {
-font-family: var(–mono); font-size: 9px; font-weight: 700;
+font-family: var(--mono); font-size: 9px; font-weight: 700;
 letter-spacing: 0.24em; color: var(–orange); text-transform: uppercase;
 }
 #timer-display {
-font-family: var(–mono); font-size: 22px; font-weight: 700;
-color: var(–text); letter-spacing: 0.03em; line-height: 1;
+font-family: var(--mono); font-size: 22px; font-weight: 700;
+color: var(--text); letter-spacing: 0.03em; line-height: 1;
 display: flex; align-items: baseline; gap: 1px;
 }
-.t-sep { color: var(–orange); opacity: 0.65; font-size: 19px; }
+.t-sep { color: var(--orange); opacity: 0.65; font-size: 19px; }
 .t-seg {
 display: inline-block; min-width: 26px; text-align: center;
 transition: color 0.08s;
 }
 .t-seg.scrambling {
-color: var(–orange2);
+color: var(--orange2);
 text-shadow: 0 0 10px rgba(255,107,26,0.7);
 }
 .t-seg.locking {
 animation: lockSnap 0.35s ease forwards;
 }
 @keyframes lockSnap {
-0%   { color: var(–gold); transform: scale(1.18); text-shadow: 0 0 14px rgba(245,200,66,0.8); }
-100% { color: var(–text); transform: scale(1); text-shadow: none; }
+0%   { color: var(--gold); transform: scale(1.18); text-shadow: 0 0 14px rgba(245,200,66,0.8); }
+100% { color: var(--text); transform: scale(1); text-shadow: none; }
 }
 #t-ms {
-font-size: 13px; color: var(–muted); font-weight: 500;
+font-size: 13px; color: var(--muted); font-weight: 500;
 letter-spacing: 0.01em; margin-left: 1px; min-width: 38px;
 }
 #timer-sub {
-font-family: var(–mono); font-size: 8px; font-weight: 500;
-letter-spacing: 0.16em; color: var(–muted); text-transform: uppercase;
+font-family: var(--mono); font-size: 8px; font-weight: 500;
+letter-spacing: 0.16em; color: var(--muted); text-transform: uppercase;
 }
 
 /* LAYOUT */
@@ -106,11 +106,11 @@ letter-spacing: 0.16em; color: var(–muted); text-transform: uppercase;
 
 .header { text-align: center; margin-bottom: 48px; animation: fadeDown 0.7s ease both; }
 .header .eyebrow {
-font-family: var(–mono); font-size: 11px; font-weight: 700;
-letter-spacing: 0.28em; color: var(–orange); text-transform: uppercase; margin-bottom: 14px;
+font-family: var(--mono); font-size: 11px; font-weight: 700;
+letter-spacing: 0.28em; color: var(--orange); text-transform: uppercase; margin-bottom: 14px;
 }
 .header h1 {
-font-family: var(–font); font-size: clamp(44px, 9vw, 74px); font-weight: 900;
+font-family: var(--font); font-size: clamp(44px, 9vw, 74px); font-weight: 900;
 line-height: 1; letter-spacing: -0.03em;
 background: linear-gradient(135deg, #fff 30%, var(–orange2));
 -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
