@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lock In — 180 Day Timetable</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+–bg: #080810;
+–card: #0f0f1a;
+–border: rgba(255,255,255,0.07);
+–orange: #ff6b1a;
+–orange2: #ff9a4d;
+–gold: #f5c842;
+–blue: #4da6ff;
+–purple: #a78bfa;
+–green: #34d399;
+–teal: #2dd4bf;
+–text: #f0eeff;
+–text-body: #c4c0de;
+–muted: #6b6b8a;
+–font: ‘Outfit’, sans-serif;
+–mono: ‘JetBrains Mono’, monospace;
+}
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: var(–font);
+font-size: 16px;
+line-height: 1.6;
+min-height: 100vh;
+padding: 100px 20px 60px;
+position: relative;
+overflow-x: hidden;
+}
+body::before {
+content:’’;position:fixed;top:-200px;left:50%;transform:translateX(-50%);
+width:800px;height:500px;
+background:radial-gradient(ellipse,rgba(255,107,26,0.12) 0%,transparent 70%);
+pointer-events:none;z-index:0;
+}
+body::after {
+content:’’;position:fixed;bottom:-100px;right:-100px;
+width:500px;height:500px;
+background:radial-gradient(ellipse,rgba(167,139,250,0.08) 0%,transparent 70%);
+pointer-events:none;z-index:0;
+}
+
+/* ── TIMER ───────────────────────────── */
+#timer-widget {
+position:fixed;top:16px;right:18px;z-index:100;
+background:rgba(12,12,22,0.88);
+border:1px solid rgba(255,107,26,0.3);
+border-radius:14px;padding:10px 18px 10px 16px;
+backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+box-shadow:0 4px 32px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.05);
+display:flex;flex-direction:column;align-items:flex-end;gap:3px;
+min-width:196px;
+}
+#timer-label {
+font-family:var(–mono);font-size:9px;font-weight:700;
+letter-spacing:0.24em;color:var(–orange);text-transform:uppercase;
+}
+#timer-display {
+font-family:var(–mono);font-size:22px;font-weight:700;
+color:var(–text);letter-spacing:0.03em;line-height:1;
+display:flex;align-items:baseline;gap:1px;
+}
+.t-sep { color:var(–orange);opacity:0.65;font-size:19px; }
+.t-seg {
+display:inline-block;min-width:26px;text-align:center;
+transition:color 0.08s;
+}
+.t-seg.scrambling {
+color:var(–orange2);
+text-shadow:0 0 10px rgba(255,107,26,0.7);
+}
+.t-seg.locking {
+animation:lockSnap 0.35s ease forwards;
+}
+@keyframes lockSnap {
+0%  {color:var(–gold);transform:scale(1.18);text-shadow:0 0 14px rgba(245,200,66,0.8);}
+100%{color:var(–text);transform:scale(1);text-shadow:none;}
+}
+#t-ms {
+font-size:13px;color:var(–muted);font-weight:500;
+letter-spacing:0.01em;margin-left:1px;min-width:38px;
+}
+#timer-sub {
+font-family:var(–mono);font-size:8px;font-weight:500;
+letter-spacing:0.16em;color:var(–muted);text-transform:uppercase;
+}
+
+/* ── LAYOUT ──────────────────────────── */
+.wrapper { max-width:860px;margin:0 auto;position:relative;z-index:1; }
+
+.header { text-align:center;margin-bottom:48px;animation:fadeDown 0.7s ease both; }
+.header .eyebrow {
+font-family:var(–mono);font-size:11px;font-weight:700;
+letter-spacing:0.28em;color:var(–orange);text-transform:uppercase;margin-bottom:14px;
+}
+.header h1 {
+font-family:var(–font);font-size:clamp(44px,9vw,74px);font-weight:900;
+line-height:1;letter-spacing:-0.03em;
+background:linear-gradient(135deg,#fff 30%,var(–orange2));
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+margin-bottom:12px;
+}
+.header .sub {
+font-size:15px;font-weight:400;color:var(–text-body);
+letter-spacing:0.01em;opacity:0.8;
+}
+
+.stats {
+display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+margin-bottom:44px;animation:fadeUp 0.7s 0.15s ease both;
+}
+.stat-card {
+background:var(–card);border:1px solid var(–border);
+border-radius:14px;padding:18px 14px;text-align:center;
+}
+.stat-card .val {
+font-size:28px;font-weight:800;line-height:1;
+margin-bottom:5px;letter-spacing:-0.02em;
+}
+.stat-card .lbl {
+font-family:var(–mono);font-size:9px;font-weight:700;
+letter-spacing:0.14em;color:var(–muted);text-transform:uppercase;
+}
+
+.section-label {
+font-family:var(–mono);font-size:10px;font-weight:700;
+letter-spacing:0.22em;color:var(–muted);text-transform:uppercase;
+margin-bottom:16px;padding-left:4px;
+}
+
+/* ── TIMELINE ─────────────────────────── */
+.timeline { display:flex;flex-direction:column;gap:10px;margin-bottom:52px;animation:fadeUp 0.7s 0.25s ease both; }
+
+.block { display:grid;grid-template-columns:132px 4px 1fr;gap:0 18px;align-items:stretch; }
+
+.block-time {
+text-align:right;padding:18px 0;
+display:flex;flex-direction:column;justify-content:center;align-items:flex-end;gap:3px;
+}
+.block-time .t-start { font-family:var(–mono);font-size:13px;font-weight:700;line-height:1; }
+.block-time .t-end   { font-family:var(–mono);font-size:10px;color:var(–muted); }
+.block-time .t-dur   { font-family:var(–mono);font-size:9px;color:var(–muted);opacity:0.6; }
+
+.block-line { display:flex;flex-direction:column;align-items:center; }
+.block-line .dot { width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:22px;z-index:1; }
+.block-line .line { width:2px;flex:1;background:var(–border);margin-top:4px; }
+
+.block-card {
+background:var(–card);border:1px solid var(–border);border-left:3px solid;
+border-radius:14px;padding:16px 22px;
+transition:transform 0.2s,box-shadow 0.2s;cursor:default;
+}
+.block-card:hover { transform:translateX(5px);box-shadow:0 6px 28px rgba(0,0,0,0.35); }
+
+.b-title {
+font-size:16px;font-weight:700;letter-spacing:-0.01em;
+margin-bottom:5px;display:flex;align-items:center;gap:9px;line-height:1.3;
+}
+.b-title .icon { font-size:17px; }
+
+.b-note {
+font-size:13px;font-weight:400;color:var(–text-body);
+margin-top:4px;line-height:1.55;
+}
+
+.b-tags { display:flex;flex-wrap:wrap;gap:6px;margin-top:10px; }
+.tag {
+font-family:var(–mono);font-size:9px;font-weight:500;letter-spacing:0.08em;
+padding:3px 9px;border-radius:5px;background:rgba(255,255,255,0.05);
+color:var(–muted);text-transform:uppercase;border:1px solid var(–border);
+}
+.tag.hot    {background:rgba(255,107,26,0.12);color:var(–orange2);border-color:rgba(255,107,26,0.25);}
+.tag.blue   {background:rgba(77,166,255,0.1);color:var(–blue);border-color:rgba(77,166,255,0.2);}
+.tag.purple {background:rgba(167,139,250,0.1);color:var(–purple);border-color:rgba(167,139,250,0.2);}
+.tag.green  {background:rgba(52,211,153,0.1);color:var(–green);border-color:rgba(52,211,153,0.2);}
+.tag.gold   {background:rgba(245,200,66,0.1);color:var(–gold);border-color:rgba(245,200,66,0.2);}
+.tag.teal   {background:rgba(45,212,191,0.1);color:var(–teal);border-color:rgba(45,212,191,0.2);}
+
+/* ── ROTATIONS ───────────────────────── */
+.rotations {
+display:grid;grid-template-columns:1fr 1fr;gap:16px;
+margin-bottom:52px;animation:fadeUp 0.7s 0.35s ease both;
+}
+.rot-card { background:var(–card);border:1px solid var(–border);border-radius:16px;padding:24px; }
+.rot-card h3 {
+font-size:14px;font-weight:700;letter-spacing:-0.01em;
+margin-bottom:16px;display:flex;align-items:center;gap:8px;
+}
+.rot-card h3 span { font-size:18px; }
+.rot-list { display:flex;flex-direction:column;gap:8px; }
+.rot-item {
+display:flex;align-items:center;gap:10px;padding:11px 13px;
+border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(–border);
+}
+.day-badge {
+font-family:var(–mono);font-size:9px;font-weight:700;padding:3px 8px;
+border-radius:5px;min-width:30px;text-align:center;text-transform:uppercase;
+letter-spacing:0.05em;flex-shrink:0;
+}
+.rot-name { font-weight:600;font-size:14px;letter-spacing:-0.01em; }
+.rot-sub  { font-family:var(–mono);font-size:10px;color:var(–muted);margin-left:auto;white-space:nowrap; }
+
+/* ── STUDY WEEK ──────────────────────── */
+.study-week {
+display:grid;grid-template-columns:repeat(7,1fr);gap:8px;
+margin-bottom:52px;animation:fadeUp 0.7s 0.4s ease both;
+}
+.study-day { background:var(–card);border:1px solid var(–border);border-radius:12px;padding:14px 8px;text-align:center; }
+.sd-day { font-family:var(–mono);font-size:9px;font-weight:700;color:var(–muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:9px; }
+.sd-icon { font-size:20px;margin-bottom:7px; }
+.sd-skill { font-size:11px;font-weight:700;line-height:1.3;letter-spacing:-0.01em; }
+
+/* ── MANTRA ──────────────────────────── */
+.mantra {
+background:linear-gradient(135deg,rgba(255,107,26,0.12),rgba(167,139,250,0.08));
+border:1px solid rgba(255,107,26,0.22);border-radius:18px;
+padding:32px 36px;text-align:center;animation:fadeUp 0.7s 0.5s ease both;
+}
+.mantra p { font-size:clamp(17px,3vw,22px);font-weight:700;line-height:1.55;letter-spacing:-0.01em; }
+.mantra p em { font-style:normal;color:var(–orange2); }
+.mantra .m-sub {
+font-family:var(–mono);font-size:10px;font-weight:700;
+color:var(–muted);margin-top:12px;letter-spacing:0.18em;text-transform:uppercase;
+}
+
+/* ── ANIMATIONS ──────────────────────── */
+@keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
+
+/* ── RESPONSIVE ──────────────────────── */
+@media(max-width:640px){
+body{padding-top:112px;}
+.stats{grid-template-columns:repeat(2,1fr);}
+.block{grid-template-columns:88px 4px 1fr;gap:0 10px;}
+.block-time .t-start{font-size:11px;}
+.rotations{grid-template-columns:1fr;}
+.study-week{grid-template-columns:repeat(4,1fr);}
+#timer-widget{min-width:155px;padding:8px 13px;}
+#timer-display{font-size:17px;}
+#t-ms{font-size:11px;}
+}
+@media(max-width:400px){
+.block{grid-template-columns:72px 4px 1fr;}
+.block-card{padding:12px 13px;}
+.study-week{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+
+</head>
+<body>
+
+<!-- ═══ TIMER ═══ -->
+
+<div id="timer-widget">
+  <div id="timer-label">Session Timer</div>
+  <div id="timer-display">
+    <span class="t-seg" id="t-h">00</span>
+    <span class="t-sep">:</span>
+    <span class="t-seg" id="t-m">00</span>
+    <span class="t-sep">:</span>
+    <span class="t-seg" id="t-s">00</span>
+    <span class="t-seg" id="t-ms">.000</span>
+  </div>
+  <div id="timer-sub">time on page</div>
+</div>
+
+<div class="wrapper">
+
+  <div class="header">
+    <div class="eyebrow">180-Day Execution Plan</div>
+    <h1>LOCK IN.</h1>
+    <div class="sub">Your daily operating system — built for compound growth</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card"><div class="val" style="color:var(--orange)">6.5h</div><div class="lbl">Total Sleep</div></div>
+    <div class="stat-card"><div class="val" style="color:var(--blue)">9h</div><div class="lbl">Deep Work</div></div>
+    <div class="stat-card"><div class="val" style="color:var(--purple)">3h</div><div class="lbl">Skill Study</div></div>
+    <div class="stat-card"><div class="val" style="color:var(--green)">180</div><div class="lbl">Day Streak</div></div>
+  </div>
+
+  <div class="section-label">Daily Schedule</div>
+  <div class="timeline" id="timeline"></div>
+
+  <div class="section-label">Build &amp; Study Rotations</div>
+  <div class="rotations">
+    <div class="rot-card">
+      <h3><span>🏗️</span> Build Rotation (Daily)</h3>
+      <div class="rot-list">
+        <div class="rot-item">
+          <span class="day-badge" style="background:rgba(255,107,26,0.15);color:var(--orange)">Day 1</span>
+          <span class="rot-name">Vinceslink.com</span><span class="rot-sub">brand site</span>
+        </div>
+        <div class="rot-item">
+          <span class="day-badge" style="background:rgba(77,166,255,0.15);color:var(--blue)">Day 2</span>
+          <span class="rot-name">Alfalf AI</span><span class="rot-sub">product</span>
+        </div>
+        <div class="rot-item">
+          <span class="day-badge" style="background:rgba(167,139,250,0.15);color:var(--purple)">Day 3</span>
+          <span class="rot-name">Portfolio</span><span class="rot-sub">personal site</span>
+        </div>
+        <div class="rot-item" style="border-color:rgba(255,107,26,0.2)">
+          <span class="day-badge" style="background:rgba(245,200,66,0.1);color:var(--gold)">⚡</span>
+          <span class="rot-name">Priority Override</span><span class="rot-sub">urgent = today</span>
+        </div>
+      </div>
+    </div>
+    <div class="rot-card">
+      <h3><span>📚</span> Skill Study Rotation</h3>
+      <div class="rot-list">
+        <div class="rot-item">
+          <span class="day-badge" style="background:rgba(52,211,153,0.15);color:var(--green)">M W F</span>
+          <span class="rot-name">Data Analysis</span><span class="rot-sub">major skill</span>
+        </div>
+        <div class="rot-item">
+          <span class="day-badge" style="background:rgba(255,107,26,0.15);color:var(--orange)">T TH</span>
+          <span class="rot-name">Marketing</span><span class="rot-sub">supporting</span>
+        </div>
+        <div class="rot-item">
+          <span class="day-badge" style="background:rgba(45,212,191,0.15);color:var(--teal)">SA SU</span>
+          <span class="rot-name">AI Automation</span><span class="rot-sub">supporting</span>
+        </div>
+        <div class="rot-item" style="border-color:rgba(52,211,153,0.15)">
+          <span class="day-badge" style="background:rgba(255,255,255,0.05);color:var(--muted)">✓</span>
+          <span class="rot-name">Existing Skills</span><span class="rot-sub">comms + social</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Weekly Study Calendar</div>
+  <div class="study-week">
+    <div class="study-day"><div class="sd-day">Mon</div><div class="sd-icon">📊</div><div class="sd-skill" style="color:var(--green)">Data Analysis</div></div>
+    <div class="study-day"><div class="sd-day">Tue</div><div class="sd-icon">📣</div><div class="sd-skill" style="color:var(--orange)">Marketing</div></div>
+    <div class="study-day"><div class="sd-day">Wed</div><div class="sd-icon">📊</div><div class="sd-skill" style="color:var(--green)">Data Analysis</div></div>
+    <div class="study-day"><div class="sd-day">Thu</div><div class="sd-icon">📣</div><div class="sd-skill" style="color:var(--orange)">Marketing</div></div>
+    <div class="study-day"><div class="sd-day">Fri</div><div class="sd-icon">📊</div><div class="sd-skill" style="color:var(--green)">Data Analysis</div></div>
+    <div class="study-day"><div class="sd-day">Sat</div><div class="sd-icon">🤖</div><div class="sd-skill" style="color:var(--teal)">AI Auto&shy;mation</div></div>
+    <div class="study-day"><div class="sd-day">Sun</div><div class="sd-icon">🤖</div><div class="sd-skill" style="color:var(--teal)">AI Auto&shy;mation</div></div>
+  </div>
+
+  <div class="mantra">
+    <p>Every day you execute this schedule, you are <em>compounding</em>.<br/>Every day you don't, someone else is.</p>
+    <div class="m-sub">180 days · No excuses · Full send</div>
+  </div>
+
+</div>
+
+<script>
+/* ── TIMELINE ── */
+const blocks = [
+  {start:"05:00 AM",end:"06:00 AM",dur:"1 hr",icon:"🌅",title:"Morning Routine",color:"var(--gold)",dotColor:"var(--gold)",tags:[{label:"Prayer",cls:"gold"},{label:"Bath & Brush",cls:""},{label:"House Chores",cls:""}],note:"Start clean. Start intentional."},
+  {start:"06:00 AM",end:"12:00 PM",dur:"6 hrs",icon:"⚡",title:"Research + Build Time",color:"var(--orange)",dotColor:"var(--orange)",tags:[{label:"X Brand",cls:"hot"},{label:"Pecunity X",cls:"hot"},{label:"Kiooverse X",cls:"hot"},{label:"Vinceslink / Alfalf / Portfolio",cls:"blue"}],note:"Post on X. Engage. Then build ONE project per rotation."},
+  {start:"12:00 PM",end:"01:00 PM",dur:"1 hr",icon:"🎮",title:"Refresh Time",color:"var(--green)",dotColor:"var(--green)",tags:[{label:"Dream League",cls:"green"},{label:"Kioomon Origins",cls:"green"},{label:"TikTok / IG",cls:""}],note:"Decompress. You've earned it."},
+  {start:"01:00 PM",end:"04:00 PM",dur:"3 hrs",icon:"💼",title:"Client Work — Pecunity & Kiooverse",color:"var(--blue)",dotColor:"var(--blue)",tags:[{label:"Pecunity",cls:"blue"},{label:"Kiooverse",cls:"blue"},{label:"Media Content",cls:"purple"},{label:"X Engagement",cls:"hot"}],note:"Stay active. Execute deliverables. Create + engage."},
+  {start:"04:00 PM",end:"06:00 PM",dur:"2 hrs",icon:"😴",title:"MANDATORY NAP",color:"var(--purple)",dotColor:"var(--purple)",tags:[{label:"Non-negotiable",cls:"purple"},{label:"Phone off",cls:""}],note:"This is recovery. It is productive. Protect it."},
+  {start:"06:00 PM",end:"09:00 PM",dur:"3 hrs",icon:"🏠",title:"Evening Routine",color:"var(--teal)",dotColor:"var(--teal)",tags:[{label:"House Chores",cls:"teal"},{label:"Cook",cls:"teal"},{label:"Friends Online",cls:""},{label:"Zealy Tasks",cls:"gold"}],note:"Sweep. Fetch water. Cook. Stay social. Clear Zealy."},
+  {start:"09:00 PM",end:"12:00 AM",dur:"3 hrs",icon:"🧠",title:"Skill Study — DND Mode",color:"var(--green)",dotColor:"var(--green)",tags:[{label:"No Social Media",cls:""},{label:"Phone DND",cls:""},{label:"Study + Practice",cls:"green"},{label:"Revision",cls:"green"}],note:"Mon/Wed/Fri → Data Analysis · Tue/Thu → Marketing · Sat/Sun → AI Automation"},
+  {start:"12:00 AM",end:"12:30 AM",dur:"30 min",icon:"✅",title:"Wind Down",color:"var(--gold)",dotColor:"var(--gold)",tags:[{label:"Zealy Tasks",cls:"gold"},{label:"Prayer",cls:"gold"}],note:"Close the day with gratitude and completed tasks."},
+  {start:"12:30 AM",end:"05:00 AM",dur:"4.5 hrs",icon:"🌙",title:"Night Sleep",color:"var(--purple)",dotColor:"var(--purple)",tags:[{label:"Core Sleep",cls:"purple"},{label:"4.5 hrs",cls:"purple"}],note:"+ 2hr nap = 6.5hrs total. You're good."},
+];
+const tl = document.getElementById('timeline');
+blocks.forEach((b,i)=>{
+  const last = i===blocks.length-1;
+  tl.innerHTML+=`
+  <div class="block" style="animation:fadeUp 0.5s ${0.1+i*0.06}s ease both;opacity:0">
+    <div class="block-time">
+      <span class="t-start">${b.start}</span>
+      <span class="t-end">→ ${b.end}</span>
+      <span class="t-dur">${b.dur}</span>
+    </div>
+    <div class="block-line">
+      <div class="dot" style="background:${b.dotColor};box-shadow:0 0 9px ${b.dotColor}"></div>
+      ${!last?'<div class="line"></div>':''}
+    </div>
+    <div class="block-card" style="border-left-color:${b.color}">
+      <div class="b-title"><span class="icon">${b.icon}</span>${b.title}</div>
+      <div class="b-note">${b.note}</div>
+      <div class="b-tags">${b.tags.map(t=>`<span class="tag ${t.cls}">${t.label}</span>`).join('')}</div>
+    </div>
+  </div>`;
+});
+
+/* ── SCRAMBLE TIMER ── */
+const CHARS = '0123456789';
+const elH  = document.getElementById('t-h');
+const elM  = document.getElementById('t-m');
+const elS  = document.getElementById('t-s');
+const elMs = document.getElementById('t-ms');
+
+const startTs = performance.now();
+
+// Scramble lasts 1.8s, then each segment locks in staggered order:
+// milliseconds → seconds → minutes → hours
+const SCRAMBLE_END  = 1800;
+const STAGGER       = 200;
+const SEGS = [
+  { el: elMs, lockAt: SCRAMBLE_END,               isMs: true  },
+  { el: elS,  lockAt: SCRAMBLE_END + STAGGER,     isMs: false },
+  { el: elM,  lockAt: SCRAMBLE_END + STAGGER*2,   isMs: false },
+  { el: elH,  lockAt: SCRAMBLE_END + STAGGER*3,   isMs: false },
+];
+const locked = [false, false, false, false];
+
+const rnd = (len) => Array.from({length:len},()=>CHARS[Math.random()*CHARS.length|0]).join('');
+const p2  = (n)   => String(n|0).padStart(2,'0');
+const p3  = (n)   => String(n|0).padStart(3,'0');
+
+function tick() {
+  const now = performance.now() - startTs;
+  const ms  = now % 1000 | 0;
+  const sec = (now / 1000 | 0) % 60;
+  const min = (now / 60000 | 0) % 60;
+  const hr  = (now / 3600000) | 0;
+  const real = ['.'+p3(ms), p2(sec), p2(min), p2(hr)];
+
+  SEGS.forEach((seg, i) => {
+    if (now >= seg.lockAt) {
+      if (!locked[i]) {
+        locked[i] = true;
+        seg.el.classList.remove('scrambling');
+        seg.el.classList.add('locking');
+        setTimeout(() => seg.el.classList.remove('locking'), 400);
+      }
+      seg.el.textContent = real[i];
+    } else {
+      seg.el.classList.add('scrambling');
+      seg.el.textContent = seg.isMs ? '.'+rnd(3) : rnd(2);
+    }
+  });
+
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+
+</body>
+</html>
