@@ -49,15 +49,6 @@ This is not a fancy app. It is a **daily operating system** — a visual timetab
 
 -----
 
-## Deployment
-
-1. Drop `timetable.html` into your GitHub repo
-1. Enable **GitHub Pages** → set source to `main` branch, root `/`
-1. Your timetable lives at `https://yourusername.github.io/repo-name/timetable.html`
-1. Bookmark it. Open it every single day.
-
------
-
 ## Stack
 
 - Pure HTML / CSS / JavaScript
